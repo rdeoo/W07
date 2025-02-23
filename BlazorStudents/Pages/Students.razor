@@ -1,0 +1,41 @@
+﻿@page "/students"
+@inject HttpClient Http
+
+<PageTitle>Students</PageTitle>
+
+<h1>Students</h1>
+
+@if(students == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <QuickGrid Items="@students">
+        <PropertyColumn Property="@(_ => _.StudentId)" Sortable="true" />
+        <PropertyColumn Property="@(_ => _.FirstName)" Sortable="true" />
+        <PropertyColumn Property="@(_ => _.LastName)" Sortable="true" />
+        <PropertyColumn Property="@(_ => _.School)" Sortable="true" />
+
+        <TemplateColumn Title="Actions">
+        <div>
+            <a class="btn btn-success btn-sm" href="/update/@context.StudentId">Edit</a>
+            <a class="btn btn-danger btn-sm ms-2" href="/delete/@context.StudentId">Delete</a>
+        </div>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    private IQueryable<Student>? students; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Http.GetFromJsonAsync<List<Student>>($"{Constants.BASE_URL}api/students");
+        if (result != null)
+        {
+            students = result.AsQueryable();
+        }
+    }
+}
+
